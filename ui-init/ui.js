@@ -25,7 +25,7 @@ function onLoad() {
 
 function walletClicked() {
   console.log("Wallet clicked.");
-  document.getElementById('wallet-data-row').style.display = "inline-block";
+  document.getElementById('wallet-data-row').style.display = "grid";
   document.getElementById('profile-data-row').style.display = "none";
   document.getElementById('token-data-row').style.display = "none";
 }
@@ -33,7 +33,7 @@ function walletClicked() {
 function profileClicked() {
   console.log("Profile clicked.");
   document.getElementById('wallet-data-row').style.display = "none";
-  document.getElementById('profile-data-row').style.display = "block";
+  document.getElementById('profile-data-row').style.display = "grid";
   document.getElementById('token-data-row').style.display = "none";
 }
 
@@ -41,5 +41,5 @@ function tokenClicked() {
   console.log("Token clicked.");
   document.getElementById('wallet-data-row').style.display = "none";
   document.getElementById('profile-data-row').style.display = "none";
-  document.getElementById('token-data-row').style.display = "block";
+  document.getElementById('token-data-row').style.display = "grid";
 }

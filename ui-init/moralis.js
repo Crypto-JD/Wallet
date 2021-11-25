@@ -549,9 +549,7 @@ getStats = async () => {
   // BILBO
   let bilboPrice = formatUSD2.format((rawPrice.usdPrice * '817.80'));
 
-
   document.querySelector('#statsSection').innerHTML = `
-
 
     <div class="container">
         <div class="jumbotron" style="text-align: center">
@@ -624,8 +622,6 @@ if (window.location.href == dashboard) {
   // document.querySelector('#transfer-ETH').onclick = displayTransferETH;
   // document.querySelector('#ETHTransferButton').onclick = transferETH;
 
-
-
   // document.querySelector('#transfer-ERC20').onclick = displaytransferERC20;
   // document.querySelector('#ERC20TransferButton').onclick = transferERC20;
 
@@ -635,9 +631,6 @@ if (window.location.href == dashboard) {
   // document.querySelector('#btn-transfer-selected-nft').onclick = transferNFTs;
 
   // document.querySelector('#transferERC20GetBalances').onclick = getTransferERC20Balances;
-
-
-
 
   // Class listeners
   let buttons = document.getElementsByClassName('clearButton')
