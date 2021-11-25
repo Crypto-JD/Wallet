@@ -1,0 +1,30 @@
+{
+  "wallet-data": {
+    "transactions": [0],
+    "balances": {
+      "mithril": 0,
+      "gold": 0
+    },
+    "reflections": 0,
+    "nft": [0]
+  },
+  "token-data": {
+    "mithril": {
+      "price": 0,
+      "liquidity": 0,
+      "bilbo": 0,
+      "total-supply": 100000000,
+      "burnt": 0
+    },
+    "gold": {
+      "price": 0,
+    }
+  },
+  "user-data": {
+    "id": 0,
+    "username": "",
+    "avatar": "",
+    "bio": "",
+    "rank": ""
+  }
+}

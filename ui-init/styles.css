@@ -1,0 +1,35 @@
+body {
+  /* Background. */
+  background-image: url('wallpaper.jpeg');
+  /* Font. */
+  color: white;
+  opacity: 1;
+  /* Sizing. */
+  height: 100vh;
+}
+
+
+#nav-row, .nav-pills, .nav-item, .nav-link {
+  /* Background. */
+  background-color: rgba(70, 152, 158, 0.05);
+  /* Font. */
+  color: white;
+}
+
+.card {
+  /* Background. */
+  background-color: rgba(70, 152, 158, 0.2);
+  /* Font. */
+  color: white;
+  /* Sizing */
+  width: 18rem;
+}
+
+
+
+.list-group {
+  /* Background. */
+  background-color: rgba(70, 152, 158, 0.2);
+  /* Font. */
+  color: white;
+}
