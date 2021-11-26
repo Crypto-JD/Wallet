@@ -99,7 +99,6 @@ getTransactions = async () => {
     // you can change that here:
     const options = { chain: "bsc" };
     const transactions = await Moralis.Web3API.account.getTransactions(options);
-    
     if (transactions.total > 0) {
         let table = `
         <table class="table">
@@ -466,7 +465,7 @@ getPriceChart = async () => {
 // STATS PAGE
 getStats = async () => {
 
-    // CURRENCY FORMATTERS
+    // FORMATTERS
     let formatUSD4 = new Intl.NumberFormat('en-US' , {
         style: 'currency',
         currency: 'USD',
@@ -500,16 +499,50 @@ getStats = async () => {
     let currentPriceMithril = formatUSD4.format(rawPrice.usdPrice);
 
     // BALANCE
-        options = { chain: "bsc" };
-    let balance = await Moralis.Web3API.account.getTokenBalances(options);
-    let tokenAddress =  "0xc4caf585c2b7eaf3f61ac69b1529e79f90b15569"; // You can specify for example: tokenAddress, name or symbol
-    let tokenBalance= balance.find((token) => token.token_address === tokenAddress);
-    console.log(tokenBalance);
+    options = { chain: "bsc" };
+    let balances = await Moralis.Web3API.account.getTokenBalances(options);
+    let tokenAddress =  "0xc4caf585c2b7eaf3f61ac69b1529e79f90b15569";
+    let rawTokBalance = balances.find((token) => token.token_address === tokenAddress);
+    let decimals = rawTokBalance.decimals
+    rawTokBalance = (rawTokBalance.balance / Math.pow(10, decimals));
+    let tokenBalance = Intl.NumberFormat().format(rawTokBalance);
 
     // BILBO
     let bilboPrice = formatUSD2.format((rawPrice.usdPrice * '817.80'));
    
-   
+
+
+    // REFLECTIONS
+
+    // Get Transactions for wallet
+    let transactions = await sendTransactionsAPI();
+    transactions = Object.entries(transactions);
+    transactions = transactions[3][1];
+
+    // Filter for only Mithiril
+    let mithrilTransactions = transactions.filter(tx => tx.address == tokenAddress);
+    let rawMithrilBuys = mithrilTransactions.filter(tx => tx.address == tokenAddress && tx.to_address == ethereum.selectedAddress);
+    let rawMithrilSells = mithrilTransactions.filter(tx => tx.address == tokenAddress && tx.from_address == ethereum.selectedAddress);
+
+    // Find Value of Buys and Sells
+    rawMithrilBuys = rawMithrilBuys.map(({value:actualValue})=>actualValue);
+    rawMithrilSells = rawMithrilSells.map(({value:actualValue})=>actualValue);
+    let mithrilBuys = [];
+    let mithrilSells = [];
+    decimalArrayValues(rawMithrilBuys, mithrilBuys);
+    decimalArrayValues(rawMithrilSells, mithrilSells);
+    mithrilBuys = mithrilBuys.reduce(function (accumulator, item) {
+        return accumulator + item;
+      }, 0);
+      mithrilSells = mithrilSells.reduce(function (accumulator, item) {
+        return accumulator + item;
+      }, 0);
+    //console.log(tokenBalance)
+    reflections = parseFloat(rawTokBalance) - (parseFloat(mithrilBuys) - parseFloat(mithrilSells));
+    mithrilBuys = Intl.NumberFormat().format(mithrilBuys);
+    mithrilSells = Intl.NumberFormat().format(mithrilSells);
+    reflections = Intl.NumberFormat().format(reflections);
+
     document.querySelector('#statsSection').innerHTML = `
 
 
@@ -531,33 +564,59 @@ getStats = async () => {
           <p class="card-text" style="font-size:20px">${liqCardContent}</p>
         </div>
         <div class="card-body" style="text-align: center">
-          <h4 class="card-title" style="border-width: 0px; font-size:35px">Bilbo Value</h4>
-          <p class="card-text" style="font-size:20px">${bilboPrice}</p>
+            <h4 class="card-title" style="border-width: 0px; font-size:35px">Bilbo Value</h4>
+            <p class="card-text" style="font-size:20px">${bilboPrice}</p>
+        </div>
+        <div class="card-body" style="text-align: center">
+          <h4 class="card-title" style="border-width: 0px; font-size:35px">Holders</h4>
+          <p class="card-text" style="font-size:20px">TBD</p>
         </div>
       </div>
     </div>
     <div class="col-lg-6">
       <div class="card" style="">
         <div class="card-body" style="text-align: center">
-          <h4 class="card-title" style="border-width: 0px; font-size:35px">Holders</h4>
-          <p class="card-text" style="font-size:20px">Sample</p>
+          <h4 class="card-title" style="border-width: 0px; font-size:35px">MITHRIL Balance</h4>
+          <p class="card-text" style="font-size:20px">${tokenBalance}</p>
         </div>
         <div class="card-body" style="text-align: center">
-          <h4 class="card-title" style="border-width: 0px; font-size:35px">Burnt</h4>
-          <p class="card-text" style="font-size:20px">Sample</p>
+          <h4 class="card-title" style="border-width: 0px; font-size:35px">Reflections</h4>
+          <p class="card-text" style="font-size:20px">${reflections}</p>
         </div>
         <div class="card-body" style="text-align: center">
-          <h4 class="card-title" style="border-width: 0px; font-size:35px">Something else</h4>
-          <p class="card-text" style="font-size:20px">Sample</p>
+          <h4 class="card-title" style="border-width: 0px; font-size:35px">Bought</h4>
+          <p class="card-text" style="font-size:20px">${mithrilBuys}</p>
+        <div class="card-body" style="text-align: center">
+          <h4 class="card-title" style="border-width: 0px; font-size:35px">Sold</h4>
+          <p class="card-text" style="font-size:20px">${mithrilSells}</p>
+        </div>
         </div>
       </div>
     </div>
     </div>
     `
     displayStats();
+
 }
 
-// BILBO PRICE
+decimalArrayValues = async (oldArr, newArr) => {
+    for (i = 0; i < oldArr.length; i++)
+        newArr.push(oldArr[i] / (Math.pow(10, 18)))
+}
+
+sendTransactionsAPI = async () => {
+        // API Call for tx
+        try {
+            let res = await fetch("https://deep-index.moralis.io/api/v2/0xd933522a41b341ed906F5bb4b7374711c505adB8/erc20/transfers?chain=bsc", {
+            headers: {
+              Accept: "application/json",
+              "X-Api-Key": "zmJ41t4ByJK8WfuCLrQQlL1apHpUyWJKZEbgXL7TnDA2grLiPIUFFc2aBA8DGqjw"
+            }});
+            return await res.json();
+        } catch (error) {
+            console.log(error);
+        }
+}
 
 
 // DASHBOARD LISTENERS
